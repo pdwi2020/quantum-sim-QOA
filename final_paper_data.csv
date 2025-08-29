@@ -1,0 +1,13 @@
+job_name,cities,qubits,seed,qaoa_runtime_sec,approximation_ratio,p_valid,best_prob,classical_runtime_sec
+paper-exp-5-cities-scale-seed-42,5,25,42,61.0,,,,
+paper-exp-4-cities-stats-seed-256,4,16,256,61.0,,,,
+paper-exp-4-cities-stats-seed-101,4,16,101,60.0,,,,
+paper-exp-4-cities-stats-seed-42,4,16,42,61.0,,,,
+paper-exp-5-cities-scale-seed-42,5,25,42,31.0,,,,
+paper-exp-4-cities-stats-seed-256,4,16,256,31.0,,,,
+paper-exp-4-cities-stats-seed-101,4,16,101,60.0,,,,
+paper-exp-4-cities-stats-seed-42,4,16,42,61.0,,,,
+paper-exp-5-cities-scale-seed-42,5,25,42,8299.0,,,,
+paper-exp-4-cities-stats-seed-256,4,16,256,1055.0,,,,
+paper-exp-4-cities-stats-seed-101,4,16,101,1087.0,,,,
+paper-exp-4-cities-stats-seed-42,4,16,42,1056.0,,,,

@@ -1,0 +1,93 @@
+INFO	2025-08-24 18:56:45 +0530	service	Waiting for job to be provisioned.
+INFO	2025-08-24 18:56:45 +0530	service	Vertex AI is provisioning job running framework. First time usage might take couple of minutes, and subsequent runs can be much faster.
+INFO	2025-08-24 18:56:45 +0530	service	Vertex AI is setting up this job.
+INFO	2025-08-24 18:56:45 +0530	service	Waiting for training program to start.
+INFO	2025-08-24 18:56:45 +0530	service	Job is preparing.
+INFO	2025-08-24 18:59:00 +0530	service	Job is running.
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	Traceback (most recent call last):
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	  File "/app/src/final_main.py", line 163, in <module>
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Starting Definitive QAOA Experiment ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	Config: Cities=4, P=[1, 2, 3, 4, 5], Optimizer=COBYLA, Starts=5, MaxIter=150, Seed=42
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Running Classical Brute-Force Solver ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	Classical solver finished in 0.000104 seconds.
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	Optimal tour: [0, 3, 2, 1] | Optimal distance: 22.725987
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	Initializing simulator for 16 qubits...
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	✅ Simulator initialized.
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	========== QAOA depth p=1 ==========
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 1/5 (p=1) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=1): -30801.664786
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 2/5 (p=1) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 3/5 (p=1) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 4/5 (p=1) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 5/5 (p=1) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	========== QAOA depth p=2 ==========
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 1/5 (p=2) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=2): 53484.408323
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 2/5 (p=2) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 3/5 (p=2) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=2): 35696.372988
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 4/5 (p=2) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=2): -52035.946666
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 5/5 (p=2) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	========== QAOA depth p=3 ==========
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 1/5 (p=3) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=3): 14996.598928
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 2/5 (p=3) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 3/5 (p=3) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 4/5 (p=3) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=3): 13536.858879
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 5/5 (p=3) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=3): 4816.942135
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	========== QAOA depth p=4 ==========
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 1/5 (p=4) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=4): -21550.210893
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 2/5 (p=4) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 3/5 (p=4) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 4/5 (p=4) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 5/5 (p=4) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	========== QAOA depth p=5 ==========
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 1/5 (p=5) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	  New best cost (p=5): 4772.077468
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 2/5 (p=5) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 3/5 (p=5) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 4/5 (p=5) ---
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	
+INFO	2025-08-24 19:16:35 +0530	workerpool0-0	--- Start 5/5 (p=5) ---
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	    main()
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	  File "/app/src/final_main.py", line 150, in main
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	    df = pd.DataFrame(metrics_rows, columns=["p", "approximation_ratio", "p_valid", "best_prob", "qaoa_runtime_sec", "classical_runtime_sec"])
+ERROR	2025-08-24 19:16:35 +0530	workerpool0-0	NameError: name 'pd' is not defined. Did you mean: 'id'?
+ERROR	2025-08-24 19:16:36 +0530	service	The replica workerpool0-0 exited with a non-zero status of 1. Termination reason: Error. To find out more about why your job exited please check the logs: https://console.cloud.google.com/logs/viewer?project=998503420879&resource=ml_job%2Fjob_id%2F6178438221983121408&advancedFilter=resource.type%3D%22ml_job%22%0Aresource.labels.job_id%3D%226178438221983121408%22
+INFO	2025-08-24 19:17:16 +0530	service	Finished tearing down training program.
+INFO	2025-08-24 19:17:16 +0530	service	Job failed.

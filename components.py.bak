@@ -1,0 +1,57 @@
+import os
+from kfp.v2.dsl import component, Input, Output, Dataset, Model
+
+# This is the full image name of the container you pushed to Artifact Registry
+# Replace 'your-gcp-project-id' with 'gen-lang-client-0671055661'
+PIPELINE_IMAGE = "us-central1-docker.pkg.dev/gen-lang-client-0671055661/my-repo/quantum-sim:v1"
+
+@component(base_image=PIPELINE_IMAGE)
+def generate_problem_task(
+    num_cities: int,
+    pauli_terms_dataset: Output[Dataset]
+):
+    """Generates the TSP instance and saves the Pauli strings to GCS."""
+    import json
+    from google.cloud import storage
+    
+    # This is the same code from your main.py
+    # (We assume main.py is in the container's src/ directory)
+    from src.main import create_tsp_instance, get_hamiltonian_pauli_strings
+
+    print(f"Generating TSP problem for {num_cities} cities...")
+    dist_matrix = create_tsp_instance(num_cities)
+    pauli_terms, _ = get_hamiltonian_pauli_strings(dist_matrix)
+
+    # Save the Pauli terms to the local path provided by Vertex AI
+    # This path automatically maps to a GCS location.
+    with open(pauli_terms_dataset.path, 'w') as f:
+        json.dump(pauli_terms, f)
+        
+    print(f"Pauli strings saved to: {pauli_terms_dataset.uri}")
+
+@component(base_image=PIPELINE_IMAGE)
+def run_simulation_task(
+    pauli_terms_dataset: Input[Dataset],
+    p_layers: int
+):
+    """Runs the QAOA simulation using the generated Pauli strings."""
+    import json
+    import numpy as np
+    
+    from src.main import PauliEvolutionSimulator
+
+    print(f"Loading Pauli strings from: {pauli_terms_dataset.uri}")
+    with open(pauli_terms_dataset.path, 'r') as f:
+        pauli_terms = json.load(f)
+
+    # The simulator logic from your main.py
+    n_qubits = len(pauli_terms[0][1]) # Infer n_qubits from Pauli string length
+    qaoa_params = np.random.rand(2 * p_layers) * np.pi
+    
+    sim = PauliEvolutionSimulator(pauli_terms, n_qubits)
+    
+    print("Starting simulation...")
+    final_state = sim.run_qaoa_step(qaoa_params, p_layers)
+    
+    print("Simulation finished successfully.")
+    print(f"Final state vector norm: {final_state.norm().item():.4f}")

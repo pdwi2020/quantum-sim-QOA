@@ -1,0 +1,171 @@
+{
+  "components": {
+    "comp-generate-problem-task": {
+      "executorLabel": "exec-generate-problem-task",
+      "inputDefinitions": {
+        "parameters": {
+          "num_cities": {
+            "parameterType": "NUMBER_INTEGER"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "artifacts": {
+          "pauli_terms_dataset": {
+            "artifactType": {
+              "schemaTitle": "system.Dataset",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        }
+      }
+    },
+    "comp-run-simulation-task": {
+      "executorLabel": "exec-run-simulation-task",
+      "inputDefinitions": {
+        "artifacts": {
+          "pauli_terms_dataset": {
+            "artifactType": {
+              "schemaTitle": "system.Dataset",
+              "schemaVersion": "0.0.1"
+            }
+          }
+        },
+        "parameters": {
+          "p_layers": {
+            "parameterType": "NUMBER_INTEGER"
+          }
+        }
+      }
+    }
+  },
+  "deploymentSpec": {
+    "executors": {
+      "exec-generate-problem-task": {
+        "container": {
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "generate_problem_task"
+          ],
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.14.2' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef generate_problem_task(\n    num_cities: int,\n    pauli_terms_dataset: Output[Dataset]\n):\n    # This component is now just a reference to a command\n    # inside the base_image. KFP will run this for us.\n    # The actual implementation is in main.py's \"generate\" task.\n    pass\n\n"
+          ],
+          "image": "us-central1-docker.pkg.dev/my-quantum-project-469717/my-repo/quantum-sim:v2"
+        }
+      },
+      "exec-run-simulation-task": {
+        "container": {
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "run_simulation_task"
+          ],
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location 'kfp==2.14.2' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\n\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\n_KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import *\n\ndef run_simulation_task(\n    pauli_terms_dataset: Input[Dataset],\n    p_layers: int\n):\n    # This component is also a reference to a command.\n    # The implementation is in main.py's \"simulate\" task.\n    pass\n\n"
+          ],
+          "image": "us-central1-docker.pkg.dev/my-quantum-project-469717/my-repo/quantum-sim:v2",
+          "resources": {
+            "accelerator": {
+              "count": "1",
+              "resourceCount": "1",
+              "resourceType": "NVIDIA_TESLA_A100",
+              "type": "NVIDIA_TESLA_A100"
+            },
+            "cpuLimit": 8.0,
+            "memoryLimit": 52.0,
+            "resourceCpuLimit": "8",
+            "resourceMemoryLimit": "52G"
+          }
+        }
+      }
+    }
+  },
+  "pipelineInfo": {
+    "description": "An automated pipeline for running QAOA simulations.",
+    "name": "quantum-simulation-pipeline"
+  },
+  "root": {
+    "dag": {
+      "tasks": {
+        "generate-problem-task": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-generate-problem-task"
+          },
+          "inputs": {
+            "parameters": {
+              "num_cities": {
+                "componentInputParameter": "cities"
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "generate-problem-task"
+          }
+        },
+        "run-simulation-task": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-run-simulation-task"
+          },
+          "dependentTasks": [
+            "generate-problem-task"
+          ],
+          "inputs": {
+            "artifacts": {
+              "pauli_terms_dataset": {
+                "taskOutputArtifact": {
+                  "outputArtifactKey": "pauli_terms_dataset",
+                  "producerTask": "generate-problem-task"
+                }
+              }
+            },
+            "parameters": {
+              "p_layers": {
+                "componentInputParameter": "p_layers"
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "run-simulation-task"
+          }
+        }
+      }
+    },
+    "inputDefinitions": {
+      "parameters": {
+        "cities": {
+          "defaultValue": 4.0,
+          "isOptional": true,
+          "parameterType": "NUMBER_INTEGER"
+        },
+        "p_layers": {
+          "defaultValue": 1.0,
+          "isOptional": true,
+          "parameterType": "NUMBER_INTEGER"
+        }
+      }
+    }
+  },
+  "schemaVersion": "2.1.0",
+  "sdkVersion": "kfp-2.14.2"
+}

@@ -1,0 +1,65 @@
+from kfp import dsl
+from kfp.compiler import Compiler
+from google.cloud import aiplatform
+
+# Import the components you just defined
+from components import generate_problem_task, run_simulation_task
+
+# ==============================================================================
+# GCP AND PIPELINE CONFIGURATION
+# ==============================================================================
+PROJECT_ID = "my-quantum-project-469717"
+REGION = "us-central1"
+PIPELINE_ROOT = "gs://my-quantum-project-469717-bucket"
+
+@dsl.pipeline(
+    name="quantum-simulation-pipeline",
+    description="An automated pipeline for running QAOA simulations."
+)
+def tsp_qaoa_pipeline(
+    cities: int = 4,
+    p_layers: int = 1
+):
+    # === Station 1: Generate the Problem ===
+    generate_op = generate_problem_task(
+        num_cities=cities
+    )
+
+    # === Station 2: Run the Simulation ===
+    simulate_op = run_simulation_task(
+        pauli_terms_dataset=generate_op.outputs["pauli_terms_dataset"],
+        p_layers=p_layers
+    )
+
+    # *** CRITICAL: Assign the A100 GPU to the simulation task (CORRECTED SYNTAX) ***
+    simulate_op.set_cpu_limit("8") \
+               .set_memory_limit("52G") \
+               .set_accelerator_limit(1) \
+               .set_accelerator_type("NVIDIA_TESLA_T4")
+
+# ==============================================================================
+# COMPILE AND RUN THE PIPELINE
+# ==============================================================================
+if __name__ == "__main__":
+    print("Compiling the pipeline...")
+    Compiler().compile(
+        pipeline_func=tsp_qaoa_pipeline,
+        package_path="pipeline.json"
+    )
+    print("Compilation successful. Submitting the pipeline to Vertex AI...")
+
+    # Initialize the Vertex AI SDK
+    aiplatform.init(project=PROJECT_ID, location=REGION)
+
+    # Create and run the pipeline job
+    job = aiplatform.PipelineJob(
+        display_name="quantum-simulation-run",
+        template_path="pipeline.json",
+        pipeline_root=PIPELINE_ROOT,
+        parameter_values={
+            "cities": 4
+        }
+    )
+
+    job.run()
+    print("Pipeline job submitted. Check the Google Cloud Console for progress.")

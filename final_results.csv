@@ -1,0 +1,5 @@
+job_name,cities,qubits,runtime_seconds,approximation_ratio
+optimizer-quantum-sim-run,4,16,91.0,
+quantum-sim-4-cities-run,4,16,60.0,
+quantum-sim-4-cities-run,4,16,61.0,
+quantum-sim-5-cities-run,5,25,61.0,

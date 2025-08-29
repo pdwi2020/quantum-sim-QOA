@@ -1,0 +1,131 @@
+import torch
+import numpy as np
+import time
+import os
+from scipy.optimize import minimize
+from itertools import permutations
+
+# Import the core simulator class from your original main script
+from main import PauliEvolutionSimulator, create_tsp_instance, get_hamiltonian_pauli_strings
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# ==============================================================================
+# 1. EXPECTATION VALUE AND DECODING FUNCTIONS (Unchanged)
+# ==============================================================================
+def get_expectation_value(final_state_vector, pauli_terms, n_qubits):
+    """Calculates the expectation value <psi|H_C|psi>."""
+    temp_sim = PauliEvolutionSimulator(pauli_terms, n_qubits)
+    total_expectation = 0
+    for i in range(len(temp_sim.coeffs)):
+        coeff = temp_sim.coeffs[i].cpu()
+        pauli_def = temp_sim.pauli_defs[i]
+        P_psi = temp_sim._apply_pauli_on_psi(pauli_def, final_state_vector)
+        expectation_k = torch.vdot(final_state_vector, P_psi).real
+        total_expectation += coeff * expectation_k
+    return total_expectation.item()
+
+def decode_results(final_state_vector, num_cities, n_qubits):
+    """Analyzes the final state vector to find the most probable TSP tour."""
+    probabilities = torch.abs(final_state_vector)**2
+    top_k_probs, top_k_indices = torch.topk(probabilities, 5)
+    
+    print("\n--- Top 5 Solution Candidates ---")
+    best_tour = None
+    best_prob = 0
+    
+    for i in range(len(top_k_probs)):
+        prob = top_k_probs[i].item()
+        bitstring = format(top_k_indices[i].item(), f'0{n_qubits}b')
+        tour = []
+        is_valid = True
+        city_matrix = np.array(list(bitstring)).reshape((num_cities, num_cities))
+        
+        if not (np.all(np.sum(city_matrix.astype(int), axis=1) == 1) and 
+                np.all(np.sum(city_matrix.astype(int), axis=0) == 1)):
+            is_valid = False
+            
+        if is_valid:
+            tour = np.argmax(city_matrix.astype(int), axis=1)
+            if best_tour is None:
+                best_tour = list(tour)
+                best_prob = prob
+
+        print(f"  {i+1}. Bitstring: {bitstring} | Tour: {list(tour) if is_valid else 'Invalid'} | Probability: {prob:.4f}")
+    return best_tour, best_prob
+
+def get_tour_distance(tour, dist_matrix):
+    """Calculates the total distance of a given tour."""
+    distance = 0
+    for i in range(len(tour)):
+        distance += dist_matrix[tour[i], tour[(i + 1) % len(tour)]]
+    return distance
+
+# ==============================================================================
+# 2. NEW MAIN EXECUTION BLOCK WITH MULTI-START OPTIMIZER
+# ==============================================================================
+def main():
+    print("--- Starting Multi-Start QAOA Optimization for TSP ---")
+    
+    NUM_CITIES = int(os.environ.get("NUM_CITIES", 4))
+    P_LAYERS = int(os.environ.get("P_LAYERS", 2))
+    NUM_STARTS = int(os.environ.get("NUM_STARTS", 5)) # Number of random starts for the optimizer
+    
+    print(f"\nOptimizing TSP for {NUM_CITIES} cities ({NUM_CITIES**2} qubits) with p={P_LAYERS}...")
+    print(f"Using a multi-start strategy with {NUM_STARTS} random initial points.")
+    
+    dist_matrix = create_tsp_instance(NUM_CITIES)
+    pauli_terms, n_qubits = get_hamiltonian_pauli_strings(dist_matrix)
+    
+    sim = PauliEvolutionSimulator(pauli_terms, n_qubits)
+    
+    # --- Define the Objective Function ---
+    def objective_function(params):
+        final_state = sim.run_qaoa_step(params, P_LAYERS)
+        cost = get_expectation_value(final_state, pauli_terms, n_qubits)
+        print(f"    Params: {np.round(params, 3)}, Cost: {cost:.4f}")
+        return cost
+
+    # --- Run the Multi-Start Classical Optimizer ---
+    print("\nStarting classical multi-start optimization...")
+    best_result_so_far = None
+
+    for i in range(NUM_STARTS):
+        print(f"\n--- Optimizer Start {i+1}/{NUM_STARTS} ---")
+        initial_params = np.random.rand(2 * P_LAYERS) * np.pi
+        
+        result = minimize(
+            objective_function, 
+            initial_params, 
+            method='L-BFGS-B', 
+            options={'maxiter': 25} # Increased iterations
+        )
+        
+        if best_result_so_far is None or result.fun < best_result_so_far.fun:
+            best_result_so_far = result
+            print(f"  Found new best cost: {result.fun:.4f}")
+
+    optimal_params = best_result_so_far.x
+    print("\nOptimization complete.")
+    print(f"Best overall cost found: {best_result_so_far.fun:.4f}")
+    print(f"Optimal Parameters: {optimal_params}")
+
+    # --- Analyze the Final Solution ---
+    final_state_optimized = sim.run_qaoa_step(optimal_params, P_LAYERS)
+    qaoa_tour, qaoa_prob = decode_results(final_state_optimized, NUM_CITIES, n_qubits)
+    
+    if qaoa_tour:
+        qaoa_distance = get_tour_distance(qaoa_tour, dist_matrix)
+        print(f"\nBest tour found by QAOA: {qaoa_tour} with distance {qaoa_distance:.4f} (Probability: {qaoa_prob:.4f})")
+        
+        all_tours = list(permutations(range(NUM_CITIES)))
+        optimal_distance = min([get_tour_distance(tour, dist_matrix) for tour in all_tours])
+        print(f"True optimal distance: {optimal_distance:.4f}")
+        
+        approximation_ratio = qaoa_distance / optimal_distance
+        print(f"\n---> Approximation Ratio: {approximation_ratio:.4f} <---") # Make it easy to find
+    else:
+        print("\n---> No valid tour found in top candidates after multi-start optimization. <---")
+
+if __name__ == "__main__":
+    main()
