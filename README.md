@@ -28,10 +28,10 @@ The platform was used to investigate the Quantum Approximate Optimization Algori
 Our platform is designed for automation and scalability, leveraging a serverless MLOps architecture on GCP. The overall system architecture (Figure 1) proceeds from a local development blueprint to a fully managed cloud execution environment. This is orchestrated by a formal MLOps pipeline (Figure 2) that ensures reproducibility and automates the entire experimental lifecycle.
 
 ### Figure 1: Overall System Architecture
-![Overall System Architecture](images/Figure%201%20Overall%20System%20Architecture.png)
+![Overall System Architecture](images/9.png)
 
 ### Figure 2: MLOps Workflow Pipeline
-![MLOps Workflow Pipeline](images/Figure%202%20MLOps%20Workflow%20Pipeline.png)
+![MLOps Workflow Pipeline](images/10.png)
 
 ---
 
@@ -40,7 +40,7 @@ Our platform is designed for automation and scalability, leveraging a serverless
 The primary obstacle to classical quantum simulation is the exponential scaling of resources. Our investigation revealed a hierarchy of cascading bottlenecks that must be overcome to enable large-scale simulation.
 
 ### Figure 3: Memory Bottleneck Hierarchy and Resolution
-![Memory Bottleneck Hierarchy and Resolution](images/Figure%203%20Memory%20Bottleneck%20Hierarchy%20and%20Resolution.png)
+![Memory Bottleneck Hierarchy and Resolution](images/3.png)
 
 1.  **Level 1: GPU VRAM Limitation:** A naive approach fails at 16 qubits, as the dense operator matrix (~64GB) and its temporary copies exceed the VRAM of high-end GPUs.
 2.  **Level 2: CPU System RAM Limitation:** JIT methods that stream to the GPU fail next, as classical libraries exhaust host system RAM when constructing the matrices.
@@ -54,7 +54,7 @@ The primary obstacle to classical quantum simulation is the exponential scaling 
 The core innovation of our platform is the `PauliEvolutionSimulator`, which avoids all dense matrix construction. The Hamiltonian is stored as a list of Pauli strings and coefficients, and the evolution is computed analytically on the GPU using memory-efficient bitwise permutations.
 
 ### Figure 4: Matrix-Free Quantum Simulator Architecture
-![Matrix-Free Quantum Simulator Architecture](images/Figure%204%20Matrix-Free%20Quantum%20Simulator%20Architecture.png)
+![Matrix-Free Quantum Simulator Architecture](images/4.png)
 
 ---
 
@@ -62,13 +62,13 @@ The core innovation of our platform is the `PauliEvolutionSimulator`, which avoi
 
 We used our platform to conduct a comprehensive optimization campaign for the 4-city (16-qubit) TSP.
 
-### Figure 6: TSP Hamiltonian Formulation
-![TSP Hamiltonian Formulation](images/Figure%206%20TSP%20Hamiltonian%20Formulation.png)
-
 The experiment followed a robust, multi-start optimization workflow designed to find the best possible QAOA solution.
 
 ### Figure 5: QAOA Optimization Workflow
-![QAOA Optimization Workflow](images/Figure%205%20QAOA%20Optimization%20Workflow.png)
+![QAOA Optimization Workflow](images/5.png)
+
+### Figure 6: TSP Hamiltonian Formulation
+![TSP Hamiltonian Formulation](images/6.png)
 
 ---
 
@@ -78,7 +78,7 @@ The experiment followed a robust, multi-start optimization workflow designed to 
 
 Our platform demonstrates extreme efficiency. The total job runtime is dominated by the fixed ~60-second overhead of cloud infrastructure, with the actual compute time for the quantum simulation being negligible in comparison for systems up to 25 qubits.
 
-![Vertex AI Job Runtime vs. System Size on A100 GPU](images/Vertex%20AI%20Job%20Runtime%20vs.%20System%20Size%20on%20A100%20GPU.png)
+![Vertex AI Job Runtime vs. System Size on A100 GPU](images/new.png)
 
 ### The Deceptive Landscape Discovery
 
@@ -87,13 +87,13 @@ Our primary scientific finding is that for the 4-city TSP, the QAOA energy lands
 A deceptive landscape is a rugged, multi-modal energy surface where the lowest points (minima) do not correspond to the true, valid solution of the problem. As shown conceptually in Figure 8, this can easily trap a standard optimizer.
 
 **Figure 8: Conceptual Visualization of a Deceptive Landscape**
-![Conceptual Visualization of a Deceptive Landscape](images/deceptive_landscape_3d.png)
+![Conceptual Visualization of a Deceptive Landscape](images/8.png)
 > The optimizer's goal is to find the lowest point (global minimum), but the rugged terrain with many local minima can trap it in a suboptimal solution.
 
 Our empirical results, visualized in Figure 9, confirmed this behavior. The optimizer successfully finds low-energy states, but the landscape structure, particularly for deeper circuits, is complex and contains many such traps. Ultimately, the states with the highest probability were all invalid.
 
 **Figure 9: Empirical Evidence of a Deceptive Landscape**
-![Empirical Evidence of a Deceptive Landscape](images/QAOA%20Deceptive%20Optimization%20Landscape.png)
+![Empirical Evidence of a Deceptive Landscape](images/1.png)
 > The plot shows the energy landscape for different QAOA depths (p). The optimizer aims for the global minimum (star), but local minima (X) can trap the search, especially as the landscape becomes more rugged with increasing depth.
 
 ---
